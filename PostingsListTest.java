@@ -153,7 +153,7 @@ public class PostingsListTest {
 	
 	// phrase 1
 	l1.addPosting(42, 13);
-	l2.addPosting(42, 14);
+	l2.addPosting(42, 15);
 
 	//phrase 2
 	l1.addPosting(42, 99);
@@ -168,6 +168,24 @@ public class PostingsListTest {
 	Assert.assertEquals(3, intersected.totalOccurrences());
     }
 
+    /**
+     * Tests whether a positional merge succeeds when
+     * documents IDs are high and passed to the
+     * added in no particular order.
+     */
+    @Test
+    public void posMergeTest4() {
+	PostingsList l1 = new PostingsList();
+	PostingsList l2 = new PostingsList();
+
+	// phrase 1
+	l1.addPosting(128, 130);
+	l2.addPosting(128, 131);
+
+	PostingsList intersected = l1.posIntersect(l2);
+
+	Assert.assertEquals(1, intersected.getDocuments().size());
+    }
 
     /**
      * Tests whether it's possible to merge arbitrarily

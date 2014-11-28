@@ -5,27 +5,37 @@ import java.util.Set;
 import java.util.HashSet;
 
 public class DocumentCollectionTest {
+    Index index;
+    DocumentCollection docs;
+
+    public DocumentCollectionTest() throws Exception {
+	index = new Index();
+
+	docs = new DocumentCollection("test_08n0147.xml", index);
+
+    }
+
+
     @Test
-    public void firstTest() throws Exception {
-	Index index = new Index();
-
-	DocumentCollection docs = new DocumentCollection("test_08n0147.xml", index);
-
-	//Assert.assertEquals(30000, docs.numberOfDocs());
-
+    public void andSearchTest() throws Exception {
 	String query[] = {
+	    "genetic",
 	    "analysis",
-	    "Genetic",
-	    "of",
 	    "mutations",
-	    "affecting",
 	};
 
-	//Set<String> queryset = new HashSet<String>(Arrays.asList(query));
+	Set<String> queryset = new HashSet<String>(Arrays.asList(query));
 
-	//Assert.assertEquals("boolean search should yield one result",
-	//1, index.andSearch(queryset).size());
+	Assert.assertEquals("boolean search should yield one result",
+	6, index.andSearch(queryset).size());
+    }
 
-	Assert.assertEquals(1, index.findPhrase("Genetic analysis of mutations affecting").size());
+
+    @Test
+    public void findPhraseTest() throws Exception {
+
+
+
+	Assert.assertEquals(1, index.findPhrase("Genetic analysis of").size());
     }
 }

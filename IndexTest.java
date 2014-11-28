@@ -288,6 +288,20 @@ public class IndexTest {
 			    index.findPhrase("Two years after").size());
     }
 
+
+    @Test
+    public void phraseSearchTest5() {
+	Index index = new Index();
+
+	index.addDocument(1, "for testing purposes");
+	index.addDocument(128, "Prosthetic rehabilitation of unilateral distal edentulism (Kennedy class 2) and its combination with intercalated absence on the other side (class 2, modification 1) is discussed. Success obtained in a series of 29 cases followed for 9 yr using a removable prosthesis is described. This solved the difficult problems involved by employing metal wires to distribute the forces axially on the abutment teeth and over the unilateral edentulous ridge, thus creating a mixed dental and mucosal support.");
+	// index.addDocument(2, "some noise");
+	// index.addDocument(3, "some more noise");
+	// index.addDocument(4, "success obtained");
+	// index.addDocument(5, "(kennedy class 2");
+
+	Assert.assertEquals(1, index.findPhrase("(kennedy class 2)").size());
+    }
     
 
     /**
