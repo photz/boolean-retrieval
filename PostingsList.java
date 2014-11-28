@@ -1,6 +1,7 @@
 import java.util.Collection;
 import java.util.SortedMap;
 
+
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class PostingsList {
     public PostingsList() {
 	postings = new TreeMap<Integer, Collection<Integer>>();
     }
+
 
     private PostingsList(SortedMap<Integer, Collection<Integer>> _postings) {
 	postings = _postings;
@@ -59,7 +61,6 @@ public class PostingsList {
 
 	// TODO eliminate the repetition in intersect()
 	// and posIntersect()
-	
 
 	Iterator<Map.Entry<Integer, Collection<Integer>>> list2_iterator = list2.postings.entrySet().iterator();
 
@@ -73,13 +74,13 @@ public class PostingsList {
 	    // we hit a document id that's equal to or greater
 	    // than the current document id in the outer loop
 	    while (list2_iterator.hasNext()
-		   && list2_crnt.getKey() < posting.getKey()) {
+		   && list2_crnt.getKey().intValue() < posting.getKey().intValue()) {
 
 		list2_crnt = list2_iterator.next();
 	    }
 
 
-	    if (list2_crnt.getKey() == posting.getKey()) {
+	    if (list2_crnt.getKey().intValue() == posting.getKey().intValue()) {
 
 		// if there are no positions, something's broken
 		assert list2_crnt.getValue().size() > 0;
@@ -100,26 +101,33 @@ public class PostingsList {
 		    // where pos_list1 + 1 == list2_pos_crnt
 
 		    while (list2_iter.hasNext()
-			   && list2_pos_crnt <= 1 + pos_list1) {
+			   && list2_pos_crnt.intValue() <= 1 + pos_list1.intValue()) {
 			
 			list2_pos_crnt = list2_iter.next();
 		    }
 
-		    if (list2_pos_crnt == 1 + pos_list1) {
+		    if (list2_pos_crnt.intValue() == 1 + pos_list1.intValue()) {
 
-			// we found a phrase, now add the
+			// we found a phrase, now add its
+			// position to the result
+			// note that we add the position
+			// of the rightmost element,
+			// so further concatenations are possible
 
 			list3.addPosting(posting.getKey(),
 					 list2_pos_crnt);
+
+			//break;
 		    }
 		}
-
 	    }
 	}
 
-
 	return list3;
     }
+
+
+
 
 
     public PostingsList intersect(PostingsList list2) {
@@ -147,18 +155,16 @@ public class PostingsList {
 	    // we hit a document id that's equal to or greater
 	    // than the current document id in the outer loop
 	    while (list2_iterator.hasNext()
-		   && list2_crnt.getKey() < posting.getKey()) {
+		   && list2_crnt.getKey().intValue() < posting.getKey().intValue()) {
 
 		list2_crnt = list2_iterator.next();
 	    }
 
-
-	    if (list2_crnt.getKey() == posting.getKey()) {
+	    if (list2_crnt.getKey().intValue() == posting.getKey().intValue()) {
 		// add to result
 		list3.addPosting(posting.getKey(), 1);
 	    }
 	}
-
 	
 	return list3;
     }
