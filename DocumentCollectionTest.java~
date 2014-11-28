@@ -1,0 +1,6 @@
+public class DocumentCollectionTest {
+    @Test
+    public void firstTest() {
+	DocumentCollection docs = new DocumentCollection("test_08n0147.xml");
+    }
+}
