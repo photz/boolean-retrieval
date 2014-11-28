@@ -142,9 +142,30 @@ public class PostingsListTest {
     }
 
 
+    /**
+     * Tests whether the method posIntersect() retains multiple
+     * ocurrences of the same phrase in the same document.
+     */
     @Test
     public void posMergeTest3() {
+	PostingsList l1 = new PostingsList();
+	PostingsList l2 = new PostingsList();
+	
+	// phrase 1
+	l1.addPosting(42, 13);
+	l2.addPosting(42, 14);
 
+	//phrase 2
+	l1.addPosting(42, 99);
+	l2.addPosting(42, 100);
+
+	// phrase 3
+	l1.addPosting(42, 77);
+	l2.addPosting(42, 78);
+
+	PostingsList intersected = l1.posIntersect(l2);
+
+	Assert.assertEquals(3, intersected.totalOccurrences());
     }
 
 
