@@ -170,5 +170,21 @@ public class PostingsList {
     public Set<Integer> getDocuments() {
 	return postings.keySet();
     }
+
+    /**
+     * When doing a phrase search, a phrase may occur multiple
+     * times in the same document.  This method returns
+     * the total number of occurrences.  This number is commonly
+     * referred to as the frequency of the given term/phrase.
+     */
+    public int totalOccurrences() {
+	int total_count = 0;
+
+	for (Collection<Integer> positions : postings.values()) {
+	    total_count += positions.size();
+	}
+
+	return total_count;
+    }
     
 }
