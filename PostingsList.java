@@ -6,10 +6,12 @@ import java.util.Set;
 import java.util.Iterator;
 import java.util.Map;
 
+import java.io.Serializable;
+
 import java.util.TreeMap;
 import java.util.ArrayList;
 
-public class PostingsList {
+public class PostingsList implements Serializable {
     
     private SortedMap<Integer, Collection<Integer>> postings;
 

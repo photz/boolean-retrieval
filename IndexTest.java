@@ -166,7 +166,7 @@ public class IndexTest {
      * and loaded.
      */
     @Test
-    public void loadingStoringTest1() {
+    public void loadingStoringTest1() throws Exception {
 	// create a new index from scratch
 	Index index = new Index();
 

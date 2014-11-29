@@ -8,6 +8,7 @@ import java.util.Set;
 
 import java.util.Arrays;
 
+import java.io.*;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.HashMap;
@@ -20,8 +21,10 @@ public class Index {
     /**
      * Attempts to load an existing index from a file.
      */
-    public Index(String filename) {
-	
+    public Index(String filename) throws Exception {
+	ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filename)));
+
+	postingsLists = (Map<String,PostingsList>) ois.readObject();
     }
 
 
@@ -156,8 +159,10 @@ public class Index {
     /**
      * Store the index permanently on disk.
      */
-    public void save(String filename) {
-	
+    public void save(String filename) throws Exception {
+	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(filename)));
+
+	oos.writeObject(postingsLists);
     }
 
 
