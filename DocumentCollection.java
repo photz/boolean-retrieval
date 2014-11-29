@@ -2,6 +2,9 @@ import javax.xml.stream.*;
 
 public class DocumentCollection {
 
+    /**
+     * The number of documents in this document collection
+     */
     int ndocs;
 
     public DocumentCollection(String filename,
@@ -20,6 +23,8 @@ public class DocumentCollection {
 	String tag_contents = "";
 	boolean get_text = true;
 
+	// as long as we've not yet hit the end of the document
+	// keep pulling events
 	while (reader.hasNext()) {
 	    
 	    int event = reader.next();
@@ -27,6 +32,7 @@ public class DocumentCollection {
 	    switch (event) {
 
 	    case XMLStreamConstants.START_ELEMENT:
+		// an opening XML tag has been found
 		{
 		    String tagname = reader.getLocalName();
 		
@@ -44,13 +50,16 @@ public class DocumentCollection {
 		break;
 
 	    case XMLStreamConstants.CHARACTERS:
+		// a chunk of text has been encountered
 		if (get_text) {
 		    tag_contents = reader.getText().trim();
 		    get_text = false;
 		}
 		break;
 
+
 	    case XMLStreamConstants.END_ELEMENT:
+		// a closing XML tag has been found
 		{
 		    String tagname = reader.getLocalName();
 
@@ -69,6 +78,11 @@ public class DocumentCollection {
 
 			ndocs++;
 
+			// we insert an arbitrary uncommon
+			// delimiter between the title and
+			// the abstract so there can't be a 
+			// phrase search that extends from
+			// the title to the abstract
 			index.addDocument(pmid,
 					  article_title + " XXX " + abstract_text);
 		    }
