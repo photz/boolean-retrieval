@@ -5,7 +5,7 @@ public class DocumentCollection {
     /**
      * The number of documents in this document collection
      */
-    int ndocs;
+    private int ndocs;
 
     public DocumentCollection(String filename,
 			      Index index) throws Exception{
