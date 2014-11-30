@@ -1,7 +1,9 @@
+benchmark_path = benchmark.txt
+jar_path = search.jar
 classpath = .:junit4.jar:hamcrest-core-1.3.jar
 
 jar:	index documentcollection postingslist search
-	jar cfe search.jar Search Search.class Index.class PostingsList.class DocumentCollection.class
+	jar cfe $(jar_path) Search Search.class Index.class PostingsList.class DocumentCollection.class
 
 
 search: postingslist documentcollection index
@@ -30,4 +32,11 @@ documentcollectiontest: documentcollection
 
 tests: postingslisttest indextest documentcollectiontest
 	java -cp $(classpath) org.junit.runner.JUnitCore IndexTest PostingsListTest DocumentCollectionTest
+
+benchmark: jar
+	python benchmark.py > $(benchmark_path)
+
+pack: jar benchmark
+	tar -czf gruppe5_aufgabe2.tar.gz $(benchmark_path) $(jar_path) Index.java PostingsList.java DocumentCollection.java Search.java
+
 
