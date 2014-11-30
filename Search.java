@@ -7,9 +7,9 @@ import java.util.HashSet;
 
 public class Search {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
-	String indexfile = "index-333";
+	String indexfile = "tmp_index";
 
 	// build the index
 	if (args.length == 2
@@ -17,20 +17,15 @@ public class Search {
 
 	    String corpusfile = args[1];
 
-	    System.out.println("corps: " + corpusfile);
-
-	    
-
 	    Index index = new Index();
 
 	    try {
-		DocumentCollection docs = 
-		    new DocumentCollection(corpusfile, index);
+		DocumentCollection docs = new DocumentCollection(corpusfile, index);
 
 		index.save(indexfile);
 	    }
 	    catch (Exception e) {
-		System.out.println("sth went wrong!");
+		System.out.println("error" + e.getMessage());
 	    }
 	}
 	// search for a phrase
@@ -43,7 +38,9 @@ public class Search {
 
 		Collection<Integer> res = index.findPhrase(phrase);
 
-		System.out.println("Matches: " + (String) String.valueOf(res.size()));
+		System.out.println("Number of documents matching the criteria: " + String.valueOf(res.size()));
+
+		System.out.println("Total occurrences of the phrase: " + String.valueOf(index.getLastQueryTotalCount()));
 
 		for (Integer docid : res) {
 		    System.out.println(String.valueOf(docid));
@@ -51,7 +48,7 @@ public class Search {
 		
 	    }
 	    catch (Exception e) {
-		System.out.println("sth went wrong!" + e.getMessage());
+		System.out.println("error: " + e.getMessage());
 	    }
 	    
 	}
@@ -65,7 +62,7 @@ public class Search {
 
 		Collection<Integer> res = index.andSearch(termset);
 
-		System.out.println("Matches: " + (String) String.valueOf(res.size()));
+		System.out.println("Number of documents matching the criteria: " + (String) String.valueOf(res.size()));
 
 		for (Integer docid : res) {
 		    System.out.println(String.valueOf(docid));
@@ -73,7 +70,7 @@ public class Search {
 		
 	    }
 	    catch (Exception e) {
-		System.out.println("sth went wrong!" + e.getMessage());
+		System.out.println("error: " + e.getMessage());
 	    }
 
 
