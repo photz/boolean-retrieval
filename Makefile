@@ -36,6 +36,9 @@ tests: postingslisttest indextest documentcollectiontest
 benchmark: jar
 	python benchmark.py > $(benchmark_path)
 
+buildindex: jar
+	java -jar search.jar -index test_08n0147.xml
+
 pack: jar benchmark
 	tar -czf gruppe5_aufgabe2.tar.gz $(benchmark_path) $(jar_path) Index.java PostingsList.java DocumentCollection.java Search.java
 
