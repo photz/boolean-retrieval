@@ -19,7 +19,7 @@ public class DocumentCollectionTest {
     @Test
     public void doNothing() {}
 
-    //@Test
+    @Test
     public void andSearchTest() throws Exception {
 	String query[] = {
 	    "genetic",
@@ -34,12 +34,12 @@ public class DocumentCollectionTest {
     }
 
 
-    //@Test
+    @Test
     public void findPhraseTest1() throws Exception {
 
 
 
-	Assert.assertEquals(3, index.findPhrase("Genetic analysis of").size());
+	Assert.assertEquals(11, index.findPhrase("Genetic analysis of").size());
     }
 
     @Test
@@ -67,7 +67,8 @@ public class DocumentCollectionTest {
 	Assert.assertEquals(1, index.findPhrase("continuing education and general internal medicine.").size());
     }
 
-    //@Test
+
+    @Test
     public void saveIndexTest() throws Exception {
 	index.save("big-index-4434231231321");
     }
