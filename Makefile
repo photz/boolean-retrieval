@@ -39,7 +39,7 @@ benchmark: jar
 buildindex: jar
 	java -jar search.jar -index test_08n0147.xml
 
-pack: jar benchmark
+pack: jar benchmark buildindex
 	tar -czf gruppe5_aufgabe2.tar.gz $(benchmark_path) $(jar_path) Index.java PostingsList.java DocumentCollection.java Search.java
 
 
