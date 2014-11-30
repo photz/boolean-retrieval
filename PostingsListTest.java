@@ -137,8 +137,6 @@ public class PostingsListTest {
 	Assert.assertTrue(intersected.getDocuments().contains(6));
 
 	Assert.assertTrue(intersected.getDocuments().contains(9));
-
-	
     }
 
 
@@ -153,15 +151,20 @@ public class PostingsListTest {
 	
 	// phrase 1
 	l1.addPosting(42, 13);
-	l2.addPosting(42, 15);
+	l2.addPosting(42, 14);
 
 	//phrase 2
+	l1.addPosting(42, 77);
+	l2.addPosting(42, 78);
+
+	// phrase 3
 	l1.addPosting(42, 99);
 	l2.addPosting(42, 100);
 
-	// phrase 3
-	l1.addPosting(42, 77);
-	l2.addPosting(42, 78);
+	// junk
+	l1.addPosting(42, 102);
+	l2.addPosting(42, 104);
+
 
 	PostingsList intersected = l1.posIntersect(l2);
 
@@ -186,6 +189,46 @@ public class PostingsListTest {
 
 	Assert.assertEquals(1, intersected.getDocuments().size());
     }
+
+    
+    /**
+     * Tests whether the method posIntersect() retains multiple
+     * ocurrences of the same phrase in the same document.
+     */
+    @Test
+    public void posMergeTest5() {
+	PostingsList l1 = new PostingsList();
+	PostingsList l2 = new PostingsList();
+	
+	// phrase 1
+	l1.addPosting(400, 111);
+	l2.addPosting(400, 112);
+
+	//phrase 2
+	l1.addPosting(400, 300);
+	l2.addPosting(400, 301);
+
+	// phrase 3
+	l1.addPosting(400, 303);
+	l2.addPosting(400, 304);
+
+	// phrase 4
+	l1.addPosting(200, 1);
+	l2.addPosting(200, 2);
+
+	//phrase 5
+	l1.addPosting(200, 3);
+	l2.addPosting(200, 4);
+
+	// phrase 6
+	l1.addPosting(200, 79);
+	l2.addPosting(200, 80);
+
+	PostingsList intersected = l1.posIntersect(l2);
+
+	Assert.assertEquals(6, intersected.totalOccurrences());
+    }
+
 
     /**
      * Tests whether it's possible to merge arbitrarily
@@ -229,6 +272,12 @@ public class PostingsListTest {
 	PostingsList l4 = new PostingsList();
 	PostingsList l5 = new PostingsList();
 	PostingsList l6 = new PostingsList();
+	PostingsList l7 = new PostingsList();
+	PostingsList l8 = new PostingsList();
+	PostingsList l9 = new PostingsList();
+	PostingsList l10 = new PostingsList();
+	PostingsList l11 = new PostingsList();
+	PostingsList l12 = new PostingsList();
 
 	l1.addPosting(13, 7);
 	l2.addPosting(13, 8);
@@ -236,8 +285,30 @@ public class PostingsListTest {
 	l4.addPosting(13, 10);
 	l5.addPosting(13, 11);
 	l6.addPosting(13, 12);
+	l7.addPosting(13, 13);
+	l8.addPosting(13, 14);
+	l9.addPosting(13, 15);
+	l10.addPosting(13, 16);
+	l11.addPosting(13, 17);
+	l12.addPosting(13, 18);
+
+	// create a few additional postings
+	// to add some realism
+	l1.addPosting(13, 100);
+	l2.addPosting(5000, 100);
+	l3.addPosting(30000, 200);
 	
-	PostingsList intersected = l1.posIntersect(l2).posIntersect(l3).posIntersect(l4).posIntersect(l5).posIntersect(l6);
+	PostingsList intersected = l1.posIntersect(l2)
+	    .posIntersect(l3)
+	    .posIntersect(l4)
+	    .posIntersect(l5)
+	    .posIntersect(l6)
+	    .posIntersect(l7)
+	    .posIntersect(l8)
+	    .posIntersect(l9)
+	    .posIntersect(l10)
+	    .posIntersect(l11)
+	    .posIntersect(l12);
 
 	Assert.assertEquals(1, intersected.getDocuments().size());
 
