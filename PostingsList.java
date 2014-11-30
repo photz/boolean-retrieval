@@ -103,7 +103,7 @@ public class PostingsList implements Serializable {
 		    // where pos_list1 + 1 == list2_pos_crnt
 
 		    while (list2_iter.hasNext()
-			   && list2_pos_crnt.intValue() <= 1 + pos_list1.intValue()) {
+			   && list2_pos_crnt.intValue() < 1 + pos_list1.intValue()) {
 			
 			list2_pos_crnt = list2_iter.next();
 		    }
@@ -127,8 +127,6 @@ public class PostingsList implements Serializable {
 
 	return list3;
     }
-
-
 
 
 
