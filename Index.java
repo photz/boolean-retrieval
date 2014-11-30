@@ -18,6 +18,8 @@ import java.util.ArrayList;
 public class Index {
     private Map<String,PostingsList> postingsLists;
 
+    private int lastQueryTotalCount = 0;
+
     /**
      * Attempts to load an existing index from a file.
      */
@@ -33,6 +35,10 @@ public class Index {
      */
     public Index() {
 	postingsLists = new HashMap<String, PostingsList>();
+    }
+
+    public int getLastQueryTotalCount() {
+	return lastQueryTotalCount;
     }
 
     /**
@@ -111,6 +117,8 @@ public class Index {
 	    merged = merged.intersect(next_list);
 	}
 
+	lastQueryTotalCount = merged.getDocuments().size();
+
 	return merged.getDocuments();
     }
 
@@ -152,6 +160,8 @@ public class Index {
 
 	    merged = merged.posIntersect(next_list);
 	}
+
+	lastQueryTotalCount = merged.totalOccurrences();
 
 	return merged.getDocuments();
     }
