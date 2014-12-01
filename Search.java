@@ -9,7 +9,8 @@ public class Search {
 
     public static void main(String[] args) throws Exception {
 
-	String indexfile = "tmp_index";
+	String indexfile1 = "tmp_table";
+	String indexfile2 = "tmp_postingslists";
 
 	// build the index
 	if (args.length == 2
@@ -22,7 +23,7 @@ public class Search {
 	    try {
 		DocumentCollection docs = new DocumentCollection(corpusfile, index);
 
-		index.save(indexfile);
+		index.save(indexfile1, indexfile2);
 	    }
 	    catch (Exception e) {
 		System.out.println("error" + e.getMessage());
@@ -34,7 +35,7 @@ public class Search {
 	    String phrase = args[0];
 
 	    try {
-		Index index = new Index(indexfile);
+		Index index = new Index(indexfile1, indexfile2);
 
 		Collection<Integer> res = index.findPhrase(phrase);
 
@@ -58,7 +59,7 @@ public class Search {
 	    Set<String> termset = new HashSet<String>(Arrays.asList(args));
 
 	    try {
-		Index index = new Index(indexfile);
+		Index index = new Index(indexfile1, indexfile2);
 
 		Collection<Integer> res = index.andSearch(termset);
 
