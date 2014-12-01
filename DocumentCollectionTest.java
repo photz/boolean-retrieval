@@ -10,14 +10,22 @@ public class DocumentCollectionTest {
 
     public DocumentCollectionTest() throws Exception {
 	//index = new Index("big-index-4434231231321");
-	index = new Index();
+	Index new_index = new Index();
+	//index = new Index("big-index-4434231231321_1");
 
-	docs = new DocumentCollection("test_08n0147.xml", index);
+	docs = new DocumentCollection("test_08n0147.xml",
+				      new_index);
+
+	String filename1 = "tmp-1";
+	String filename2 = "tmp-2";
+
+	// store the index
+	new_index.save(filename1, filename2);
+
+	// this is the index that will be used by the tests
+	index = new Index(filename1, filename2);
 
     }
-
-    @Test
-    public void doNothing() {}
 
     @Test
     public void andSearchTest() throws Exception {
@@ -68,8 +76,9 @@ public class DocumentCollectionTest {
     }
 
 
-    @Test
-    public void saveIndexTest() throws Exception {
-	index.save("big-index-4434231231321");
-    }
+    // @Test
+    // public void saveIndexTest() throws Exception {
+
+    // 	index.save("big-index-4434231231321_1");
+    // }
 }
