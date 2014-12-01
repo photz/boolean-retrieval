@@ -8,6 +8,8 @@ import java.util.Set;
 
 import java.util.Arrays;
 
+import java.nio.channels.FileChannel;
+
 import java.io.*;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,13 +22,27 @@ public class Index {
 
     private int lastQueryTotalCount = 0;
 
+    private Map<String, Integer> positions;
+
+    public String postingsListsFile = "tmp-plists";
+
+    public String positionsTableFile = "tmp-positions";
+
+
     /**
      * Attempts to load an existing index from a file.
      */
-    public Index(String filename) throws Exception {
-	ObjectInputStream ois = new ObjectInputStream(new FileInputStream(new File(filename)));
+    public Index(String positions_table_file,
+		 String postings_lists_file) throws Exception {
+	
+	postingsLists = new HashMap<String, PostingsList>();
 
-	postingsLists = (Map<String,PostingsList>) ois.readObject();
+	postingsListsFile = postings_lists_file;
+	positionsTableFile = positions_table_file;
+
+	loadPositionsTable();
+
+	
     }
 
 
@@ -35,6 +51,8 @@ public class Index {
      */
     public Index() {
 	postingsLists = new HashMap<String, PostingsList>();
+	
+	positions = new HashMap<String, Integer>();
     }
 
     public int getLastQueryTotalCount() {
@@ -62,7 +80,7 @@ public class Index {
 	    
 	    assert null != token;
 
-	    assert true == postingsLists.containsKey(token);
+	    //assert true == postingsLists.containsKey(token);
 
 	    // if we encounter this term for the first time
 	    // create a new potings list for it
@@ -81,7 +99,8 @@ public class Index {
     /**
      * 
      */
-    public Set<Integer>andSearch(Collection<String> terms) {
+    public Set<Integer>andSearch(Collection<String> terms)
+	throws Exception {
 
 	assert null != postingsLists;
 	assert null != terms;
@@ -100,7 +119,18 @@ public class Index {
 	    term = term.toLowerCase();
 
 	    if (!postingsLists.containsKey(term)) {
-		return new HashSet<Integer>();
+
+		// maybe the postings list for this term needs
+		// to be read from disk first
+		if (positions.containsKey(term)) {
+		    // load into memory
+
+		    loadPostingsList(term);
+		}
+		else {
+		    // this term does not exist
+		    return new HashSet<Integer>();
+		}
 	    }
 	}
 
@@ -126,7 +156,9 @@ public class Index {
      * Attempts to find an occurrence of the given
      * phrase in the document collection.
      */
-    public Collection<Integer> findPhrase(String phrase) {
+    public Collection<Integer> findPhrase(String phrase) 
+	throws Exception {
+
 	assert phrase != null;
 	assert null != postingsLists;
 
@@ -144,7 +176,15 @@ public class Index {
 	for (String term : terms) {
 
 	    if (!postingsLists.containsKey(term)) {
-		return new HashSet<Integer>();
+
+		if (positions.containsKey(term)) {
+		    // load into memory
+
+		    loadPostingsList(term);
+		}
+		else {
+		    return new HashSet<Integer>();
+		}
 	    }
 	}
 
@@ -169,12 +209,167 @@ public class Index {
     /**
      * Store the index permanently on disk.
      */
-    public void save(String filename) throws Exception {
-	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(filename)));
+    // public void saveold(String filename) throws Exception {
+    // 	ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(filename)));
 
-	oos.writeObject(postingsLists);
+    // 	oos.writeObject(postingsLists);
+    // }
+
+    public void save(String positions_table_file,
+		     String postings_lists_file) throws Exception {
+
+	postingsListsFile = postings_lists_file;
+	positionsTableFile = positions_table_file;
+	
+	postingsListsToFile();
+
+	positionsTableToFile();
+
     }
 
+    public void loadPositionsTable() 
+	throws Exception {
+	
+	assert null != positionsTableFile;
+
+	File file = new File(positionsTableFile);
+
+	FileInputStream fis = new FileInputStream(file);
+
+	ObjectInputStream ois = new ObjectInputStream(fis);
+
+	positions = (HashMap<String, Integer>) ois.readObject();
+
+	ois.close();
+
+	fis.close();
+    }
+
+    /**
+     * Writes the positions table to the hard disk.
+     */
+    public void positionsTableToFile()
+	throws IOException {
+
+	File file = new File(positionsTableFile);
+
+	FileOutputStream fos = new FileOutputStream(file);
+
+	ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+	oos.writeObject((Object) positions);
+
+	oos.close();
+
+	fos.close();
+    }
+
+
+    /**
+     * Writes the postings lists to the hard disk.
+     * @arg filename the postings lists will be written \
+     * to this file
+     */
+    public void postingsListsToFile() throws IOException {
+	assert postingsLists != null;
+
+	positions = new HashMap<String, Integer>();
+
+	File file = new File(postingsListsFile);
+
+	FileOutputStream fos = new FileOutputStream(file);
+
+	FileChannel ch = fos.getChannel();
+
+	for (Map.Entry<String, PostingsList> entry : postingsLists.entrySet()) {
+
+	    // get the current position in the file
+	    long pos = ch.position();
+
+	    // get the postings list as a byte array
+	    byte bytearr[] = objectToByteArray(entry.getValue());
+
+	    fos.write(bytearr);
+
+	    // save the position of this postings list in the file
+	    positions.put(entry.getKey(), (int) pos);
+
+	    
+
+	}
+    }
+
+    /**
+     * Reads the postings list for the term _term_ from the \
+     * hard disk.
+     */
+    public PostingsList loadPostingsList(String term)
+	throws Exception {
+
+	assert term != null;
+	assert postingsListsFile != null;
+	assert positions != null;
+	assert postingsLists != null;
+
+	if (positions == null) {
+	    throw new Exception("The positions table is not available");
+	}
+
+	if (!positions.containsKey(term)) {
+	    throw new Exception("The positions table has no entry for a term " + term);
+	}
+	
+	FileInputStream fis = new FileInputStream(new File(postingsListsFile));
+
+	fis.skip((long) positions.get(term));
+
+	ObjectInputStream oos = new ObjectInputStream(fis);
+
+	PostingsList pl = (PostingsList) oos.readObject();
+
+	postingsLists.put(term, pl);
+
+	oos.close();
+
+	fis.close();
+
+	return pl;
+    }
+
+    private static byte[] objectToByteArray(Object obj) {
+	assert obj != null;
+
+	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+	ObjectOutput out = null;
+
+	try {
+	    out = new ObjectOutputStream(bos);
+	    out.writeObject(obj);
+	    byte[] bytearr = bos.toByteArray();
+	    return bytearr;
+	}
+	catch (IOException ex) {
+	    return null;
+	}
+	finally {
+	    try {
+		if (out != null) {
+		    out.close();
+		}
+	    }
+	    catch (IOException ex) {
+		// ignore close exception
+	    }
+	    try {
+		bos.close();
+	    }
+	    catch (IOException ex) {
+		// ignore close exception
+	    }
+	}
+
+    }
 
     private static List<String> getTokens(String text) {
 	assert text != null;
