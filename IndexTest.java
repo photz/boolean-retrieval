@@ -11,7 +11,7 @@ import java.util.List;
 
 public class IndexTest {
     @Test
-    public void simpleAndSearchTest() {
+    public void simpleAndSearchTest() throws Exception {
 	// instantiate an empty index
 	Index i = new Index();
 
@@ -37,7 +37,7 @@ public class IndexTest {
     }
 
     @Test
-    public void simpleAndSearchTest2() {
+    public void simpleAndSearchTest2() throws Exception {
 	Index i = new Index();
 
 	i.addDocument(1, "A fairly boring document");
@@ -60,7 +60,7 @@ public class IndexTest {
      * have been added to functions normally
      */
     @Test
-    public void simpleAndSearchTest3() {
+    public void simpleAndSearchTest3() throws Exception{
 	Index i = new Index();
 
 	String query[] = {"arbitrary", "query"};
@@ -80,7 +80,7 @@ public class IndexTest {
      * whether the tokenizer works as expected.
      */
     @Test
-    public void simpleAndSearchTest4() {
+    public void simpleAndSearchTest4() throws Exception {
 	Index index = new Index();
 
 	index.addDocument(1,
@@ -107,7 +107,7 @@ public class IndexTest {
      * samples from the corpus.
      */
     @Test
-    public void simpleAndSearchTest5() {
+    public void simpleAndSearchTest5() throws Exception {
 	Index index = new Index();
 
 	index.addDocument(1, "Genetic analysis of mutations affecting ribonuclease II in Escherichia coli. XXX Exonuclease activity in an Escherichia coli K12 mutant S296 is less than 1% of that in the wild type strain (Nikolaev et al., 1976). Another mutant N464 has thermolabile ribonuclease II (Castles and Singer, 1968; Kuwano et al., 1969). Genetic analysis of these mutants by Hfr conjugation and P1 transduction indicates that the structural gene (rnb) for ribonuclease II is located near the pyrF gene (28 min on the E. coli genetic map of Bachmann, Low and Taylor (1976)), and the most probable gene order is tyrT-trp-pyrF-rnb.");
@@ -133,7 +133,7 @@ public class IndexTest {
      * Tests whether documents and  queries are correctly tokenized.
      */
     @Test
-    public void tokenizationTest1() {
+    public void tokenizationTest1() throws Exception {
 		Index index = new Index();
 
 	index.addDocument(1,
@@ -177,14 +177,15 @@ public class IndexTest {
 	index.addDocument(4, "Did the python eat the ape?");
 
 	// try to store the index on disk
-	String filename = "test-store-index-344342";
-	index.save(filename);
+	String filename1 = "test-store-index-1";
+	String filename2 = "test-store-index-2";
+	index.save(filename1, filename2);
 
 	// destroy the index object
 	index = null;
 
 	// try to read the object from disk
-	index = new Index(filename);
+	index = new Index(filename1, filename2);
 
 	// make sure the index has been correctly restored
 	// by performing a boolean search
@@ -211,7 +212,8 @@ public class IndexTest {
      * correctly yields no matches.
      */
     @Test
-    public void phraseSearchTest1() {
+    public void phraseSearchTest1() throws Exception {
+
 	Index index = new Index();
 
 	index.addDocument(1, "This is the first document");
@@ -229,7 +231,9 @@ public class IndexTest {
      * Tests whether a phrase that occurs in a document is found.
      */
     @Test
-    public void phraseSearchTest2() {
+    public void phraseSearchTest2()
+	throws Exception {
+
 	Index index = new Index();
 
 	index.addDocument(1, "This is the first document");
@@ -253,7 +257,9 @@ public class IndexTest {
      * A slightly more complex test than phraseSearchTest2
      */
     @Test
-    public void phraseSearchTest3() {
+    public void phraseSearchTest3() 
+	throws Exception {
+
 	Index index = new Index();
 
 	index.addDocument(1, "This is the first document");
@@ -277,7 +283,8 @@ public class IndexTest {
     }
 
     @Test
-    public void phraseSearchTest4() {
+    public void phraseSearchTest4() throws Exception {
+
 		Index index = new Index();
 
 	index.addDocument(1, "Genetic analysis of mutations affecting ribonuclease II in Escherichia coli. XXX Exonuclease activity in an Escherichia coli K12 mutant S296 is less than 1% of that in the wild type strain (Nikolaev et al., 1976). Another mutant N464 has thermolabile ribonuclease II (Castles and Singer, 1968; Kuwano et al., 1969). Genetic analysis of these mutants by Hfr conjugation and P1 transduction indicates that the structural gene (rnb) for ribonuclease II is located near the pyrF gene (28 min on the E. coli genetic map of Bachmann, Low and Taylor (1976)), and the most probable gene order is tyrT-trp-pyrF-rnb.");
@@ -290,7 +297,9 @@ public class IndexTest {
 
 
     @Test
-    public void phraseSearchTest5() {
+    public void phraseSearchTest5() 
+	throws Exception {
+
 	Index index = new Index();
 
 	index.addDocument(1, "for testing purposes");
@@ -309,7 +318,9 @@ public class IndexTest {
      * yields no matches and doesn't cause an exception.
      */
     @Test
-    public void phraseSearchTestEmptyPhrase() {
+    public void phraseSearchTestEmptyPhrase() 
+	throws Exception {
+
 	Index index = new Index();
 
 	index.addDocument(1, "This is the first document");
@@ -329,6 +340,226 @@ public class IndexTest {
 
     }
 
+    
+    @Test
+    public void loadStoreTest1()
+	throws Exception {
+
+	// create a new Index object from scratch
+	Index index = new Index();
+
+	// add a few documents
+	index.addDocument(1, "term1 term2 term3");
+	index.addDocument(2, "term2 term3 term4");
+	index.addDocument(3, "term3 term4 term5");
+	index.addDocument(4, "term2 term3 term4 term5");
+	index.addDocument(5, "term2 term3 term4 term6");
+
+	// write the index to disk
+	String filename1 = "tmp-1";
+	String filename2 = "tmp-2";
+	index.save(filename1, filename2);
+
+	// try to read it from disk
+	Index index2 = new Index(filename1, filename2);
+	
+	//
+	// make sure it works
+	//
+
+	String query[] = {"term2", "term3", "term4", "term5"};
+
+	Set<String> queryset = new HashSet<String>(Arrays.asList(query));
+
+	Assert.assertEquals(1, index2.andSearch(queryset).size());
+
+
+    }
+
+
+    @Test
+    public void loadStoreTest2() throws Exception {
+	// create an empty index
+	Index index = new Index();
+
+	// add a few documents
+	index.addDocument(1, "term1 term2 term3");
+	index.addDocument(2, "term1 term2 term3");
+	index.addDocument(3, "term2 term2 term2 term3");
+	index.addDocument(4, "term1 term2 term3 term4 term5");
+
+	// write the current index to disk
+	String filename1 = "tmp-index-1";
+	String filename2 = "tmp-index-2";
+	index.save(filename1, filename2);
+
+	// read the index from disk
+	Index index2 = new Index(filename1, filename2);
+
+	
+	String query[] = {"term3", "term1", "term2"};
+
+	Set<String> queryset = new HashSet<String>(Arrays.asList(query));
+
+	Assert.assertEquals(3, index2.andSearch(queryset).size());
+
+    }
+
+    @Test
+    public void loadStoreTest3() throws Exception {
+	// create an empty index
+	Index index = new Index();
+
+	// add a few documents
+	index.addDocument(1, "term1 term2 term3");
+	index.addDocument(2, "term1 term2 term3");
+	index.addDocument(3, "term2 term2 term2 term3");
+	index.addDocument(4, "term1 term2 term3 term4 term5");
+
+	// write the current index to disk
+	String filename1 = "tmp-index-1";
+	String filename2 = "tmp-index-2";
+	index.save(filename1, filename2);
+
+	// read the index from disk
+	Index index2 = new Index(filename1, filename2);
+
+	
+	String query[] = {"term3", "unknownTerm1", "unknownTerm2"};
+
+	Set<String> queryset = new HashSet<String>(Arrays.asList(query));
+
+	Assert.assertEquals(0, index2.andSearch(queryset).size());
+
+    }
+
+
+    @Test
+    public void loadStoreTest4() throws Exception {
+	// create an empty index
+	Index index = new Index();
+
+	// add a few documents
+	index.addDocument(1, "term1 term2 term3");
+	index.addDocument(2, "term1 term2 term3");
+	index.addDocument(3, "term2 term2 term2 term3");
+	index.addDocument(4, "term1 term2 term3 term4 term5");
+
+	// write the current index to disk
+	String filename1 = "tmp-index-1";
+	String filename2 = "tmp-index-2";
+	index.save(filename1, filename2);
+
+	// read the index from disk
+	Index index2 = new Index(filename1, filename2);
+	
+	String query = "term3 term4";
+
+	Assert.assertEquals(1, index2.findPhrase(query).size());
+    }
+
+    @Test
+    public void loadStoreTest5() throws Exception {
+	// create an empty index
+	Index index = new Index();
+
+	// add a few documents
+	index.addDocument(1, "term1 term2 term3");
+	index.addDocument(2, "term1 term2 term3");
+	index.addDocument(3, "term2 term2 term2 term3");
+	index.addDocument(4, "term1 term2 term3 term4 term5");
+
+	// write the current index to disk
+	String filename1 = "tmp-index-1";
+	String filename2 = "tmp-index-2";
+	index.save(filename1, filename2);
+
+	// read the index from disk
+	Index index2 = new Index(filename1, filename2);
+	
+	String query = "term3 term4";
+
+	Assert.assertEquals(1, index2.findPhrase(query).size());
+    }
+
+
+
+
+    @Test
+    public void loadStoreTest6() throws Exception {
+	// create an empty index
+	Index index = new Index();
+
+	// add a few documents
+	index.addDocument(1, "term1 term2 term3 term4 term5");
+	index.addDocument(2, "term1 term2 term3 term4 term6");
+	index.addDocument(3, "term1 term2 term3 term4 term7");
+	index.addDocument(4, "term1 term2 term3 term4 term8");
+	index.addDocument(5, "term1 term2 term3 term4 term9");
+	index.addDocument(6, "term1 term2 term3 term4 term10");
+	index.addDocument(7, "term1 term2 term3 term4 term11");
+	index.addDocument(8, "term1 term2 term3 term4 term12");
+
+	// write the current index to disk
+	String filename1 = "tmp-index-1";
+	String filename2 = "tmp-index-2";
+	index.save(filename1, filename2);
+
+	// read the index from disk
+	Index index2 = new Index(filename1, filename2);
+	
+	String query = "term1 term2 term3 term4 term10";
+
+	Assert.assertEquals(1, index2.findPhrase(query).size());
+    }
+
+
+
+
+    // @Test
+    // public void loadPostingsListTest1() throws Exception {
+
+    // 	Index index = new Index();
+
+    // 	index.addDocument(1, "term1 term2");
+    // 	index.addDocument(2, "term2 term3");
+    // 	index.addDocument(3, "term3 term4 term5");
+    // 	index.addDocument(4, "term4 term5 term6");
+    // 	index.addDocument(5, "term4 term4 term4 term5 term6 term7");
+
+    // 	String filename = "tmp-postingslists";
+
+    // 	index.postingsListsToFile(filename);
+
+    // 	PostingsList list_term3 = index.loadPostingsList(filename,
+    // 							 "term3");
+
+    // 	Assert.assertEquals(2, list_term3.totalOccurrences());
+
+    // 	PostingsList list_term4 = index.loadPostingsList(filename,
+    // 							 "term4");
+
+    // 	Assert.assertEquals(5, list_term4.totalOccurrences());
+
+    // }
+
+    // @Test
+    // public void loadPositionsTableTest() throws Exception {
+    // 	Index index = new Index();
+
+    // 	String filename = "tmp-postable";
+
+    // 	// add a few documents
+	
+
+    // 	// write the positions table to the disk
+    // 	index.positionsTableToFile(filename);
+
+    // 	// read the positions table into main memory
+    // 	index.loadPositionsTable(filename);
+
+	
+    // }
 
     // @Test
     // public void getTokensTest() {
