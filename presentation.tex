@@ -1,21 +1,19 @@
 \documentclass{beamer}
 
+\usetheme{Frankfurt}
+
 \usepackage{listings}
+\usepackage{mathtools}
+%\usepackage{amsmath}
 
 \mode<presentation>
 
 \title{Boolean Retrieval}
 
-\author{Ehab\\ Philipp}
+\author{Ehab Abou Asali\\ Philipp Hotz}
 
 \begin{document}
 
-\begin{frame}
-
-  \frametitle{Fuck you!}
-  \framesubtitle{subtitle}
-
-\end{frame}
 
 \begin{frame}
 
@@ -23,18 +21,171 @@
   \tableofcontents[pausesections]
 \end{frame}
 
+\section{Phrase}
+
+\begin{frame}
+  \frametitle{Phrase Search}
+
+  \begin{block}{Document Collection}
+
+    \begin{tabular}{ l | l }
+      1 & The python ate the apple \\
+      2 & Did the python eat the apple? \\
+    \end{tabular}
+
+  \end{block}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Phrase Search}
+
+  \begin{block}{Document Collection}
+
+    \begin{tabular}{ l | l }
+      1 & The python ate the apple \\
+      2 & Did the python eat the apple? \\
+    \end{tabular}
+
+  \end{block}
+
+  \begin{block}{Postings Lists}
+    \begin{tabular}{ l | l }
+      the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+      python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+      ate & $ \langle 1,(3) \rangle $ \\
+      apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+      eat & $ \langle 1,(4) \rangle $ \\
+    \end{tabular}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{Phrase Search}
+
+  \begin{block}{Document Collection}
+
+    \begin{tabular}{ l | l }
+      1 & The python ate the apple \\
+      2 & Did the python eat the apple? \\
+    \end{tabular}
+
+  \end{block}
+
+  \begin{block}{Postings Lists}
+    \begin{tabular}{ l | l }
+      the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+      python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+      ate & $ \langle 1,(3) \rangle $ \\
+      apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+      eat & $ \langle 1,(4) \rangle $ \\
+    \end{tabular}
+  \end{block}
+
+  \begin{block}{Query}
+    ``the apple''
+  \end{block}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{bla}
+\end{frame}
+
 \section{The Program We Wrote}
 
+\subsection{UML}
+
+\begin{frame}
+bla
+\end{frame}
 
 % two kinds of XML parsers
 \subsection{Reading the XML file}
 
 \begin{frame}
-  
+  \frametitle{Two Kinds of XML Parsers}
+
+  \begin{columns}
+    \column{0.5\textwidth}
+    \begin{block}{Streaming}
+      \begin{itemize}
+        \item the file is read from beginning to end in a single pass
+        \item low memory footprint
+      \end{itemize}
+    \end{block}
+    \column{0.5\textwidth}
+    \begin{block}{DOM}
+      \begin{itemize}
+      \item the entire tree is built in memory
+      \item memory footprint potentially bigger than the document itself
+      \end{itemize}
+    \end{block}
+  \end{columns}
 \end{frame}
+
+
+\begin{frame}[fragile]
+
+  \frametitle{XML}
+
+\begin{verbatim}
+hi
+\end{verbatim}
+
+\end{frame}
+
+\defverbatim[colored]\lstReadXml{
+  \begin{lstlisting}[language=Java]
+    while (EOF_not_yet_reached) {
+      switch (type_of_event) {
+        case XMLStreamConstants.START_ELEMENT:
+        if ("MedlineCitation.equals(tagname)) {
+          // ...
+        }
+        break;
+
+        case XMLStreamConstants.END_ELEMENT:
+        break;
+
+        case XMLStreamConstants.CHARACTER:
+
+        breal;
+      }
+    }
+  \end{lstlisting}
+}
+
+\begin{frame}[fragile]
+
+  \frametitle{Code Example}
+
+  \lstReadXml
+
+\end{frame}
+
 
 % storing positions in postings lists
 \subsection{Phrase Search}
+
+\defverbatim[colored]\lstPostingsList{
+  \begin{lstlisting}[language=Java,basicstyle=\ttfamily,keywordstyle=\color{red}]
+    PostingsList l1, l2, l3;
+
+    l1.posIntersect(l2).posIntersect(l3);
+  \end{lstlisting}
+}
+
+\begin{frame}
+  \frametitle{Using PostingsList}
+
+  \begin{example}
+    \lstPostingsList
+  \end{example}
+\end{frame}
+
+
 
 \begin{frame}
 
@@ -81,15 +232,22 @@
 
 
 \begin{frame}
-
   \frametitle{Quiz}
-  
-  \lstQuiz
-
+  \begin{block}
+    \lstQuiz
+    \end{block}
+  \begin{block}
+    bla!
+  \end{block}
 \end{frame}
 
 \section{Feedback}
 
-
+%% \begin{thebibliography}{10}
+%% \bibitem{Goldbach1742}[Goldbach, 1742]
+%% Christian Goldbach.
+%% \newblock A problem we should try to solve before the ISPN ’43 deadline,
+%% \newblock \emph{Letter to Leonhard Euler}, 1742.
+%% \end{thebibliography}
 
 \end{document}
