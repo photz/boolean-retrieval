@@ -2,9 +2,22 @@
 
 \usetheme{Frankfurt}
 
+\usepackage{ifluatex}
+\ifluatex
+  \usepackage{pdftexcmds}
+  \makeatletter
+  \let\pdfstrcmp\pdf@strcmp
+  \let\pdffilemoddate\pdf@filemoddate
+  \makeatother
+\fi
+
+\usepackage{color, colortbl}
+\usepackage{svg}
 \usepackage{listings}
 \usepackage{mathtools}
 %\usepackage{amsmath}
+
+\definecolor{LightCyan}{rgb}{0.88,1,1}
 
 \mode<presentation>
 
@@ -29,6 +42,7 @@
   \begin{block}{Document Collection}
 
     \begin{tabular}{ l | l }
+      DocID & Contents \\ \hline
       1 & The python ate the apple \\
       2 & Did the python eat the apple? \\
     \end{tabular}
@@ -43,6 +57,7 @@
   \begin{block}{Document Collection}
 
     \begin{tabular}{ l | l }
+      DocID & Contents \\ \hline
       1 & The python ate the apple \\
       2 & Did the python eat the apple? \\
     \end{tabular}
@@ -51,11 +66,13 @@
 
   \begin{block}{Postings Lists}
     \begin{tabular}{ l | l }
+      term & postings \\ \hline
       the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
       python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
       ate & $ \langle 1,(3) \rangle $ \\
       apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
       eat & $ \langle 1,(4) \rangle $ \\
+      did & $ \langle 2,(1) \rangle $ \\
     \end{tabular}
   \end{block}
 
@@ -64,9 +81,13 @@
 \begin{frame}
   \frametitle{Phrase Search}
 
-  \begin{block}{Document Collection}
+
+
+
+    \begin{block}{Document Collection}
 
     \begin{tabular}{ l | l }
+      DocID & Contents \\ \hline
       1 & The python ate the apple \\
       2 & Did the python eat the apple? \\
     \end{tabular}
@@ -75,19 +96,37 @@
 
   \begin{block}{Postings Lists}
     \begin{tabular}{ l | l }
+      term & postings \\ \hline
       the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
       python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
       ate & $ \langle 1,(3) \rangle $ \\
       apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
       eat & $ \langle 1,(4) \rangle $ \\
+      did & $ \langle 2,(1) \rangle $ \\
     \end{tabular}
   \end{block}
 
-  \begin{block}{Query}
-    ``the apple''
-  \end{block}
+
 
 \end{frame}
+
+\defverbatim[colored]\lstPostingsList{
+  \begin{lstlisting}[language=Java,basicstyle=\ttfamily,keywordstyle=\color{red}]
+    PostingsList the, tasty, apple;
+
+    the.posIntersect(tasty)
+       .posIntersect(apple);
+  \end{lstlisting}
+}
+
+\begin{frame}
+  \frametitle{Using PostingsList objects}
+
+  \begin{example}
+    \lstPostingsList
+  \end{example}
+\end{frame}
+
 
 \begin{frame}
   \frametitle{bla}
@@ -98,7 +137,11 @@
 \subsection{UML}
 
 \begin{frame}
-bla
+  \frametitle{UML Class Diagram}
+  \begin{figure}[htbp]
+    \centering
+    \includesvg{uml}
+  \end{figure}
 \end{frame}
 
 % two kinds of XML parsers
@@ -131,7 +174,14 @@ bla
   \frametitle{XML}
 
 \begin{verbatim}
-hi
+<quiz>
+ <qanda>
+  <question>
+    Who was the third president of the U.S.A.?
+  </question>
+  <answer>Err .. Homer Simpson?</answer>
+ </qanda>
+</quiz>
 \end{verbatim}
 
 \end{frame}
@@ -166,24 +216,8 @@ hi
 \end{frame}
 
 
-% storing positions in postings lists
-\subsection{Phrase Search}
 
-\defverbatim[colored]\lstPostingsList{
-  \begin{lstlisting}[language=Java,basicstyle=\ttfamily,keywordstyle=\color{red}]
-    PostingsList l1, l2, l3;
 
-    l1.posIntersect(l2).posIntersect(l3);
-  \end{lstlisting}
-}
-
-\begin{frame}
-  \frametitle{Using PostingsList}
-
-  \begin{example}
-    \lstPostingsList
-  \end{example}
-\end{frame}
 
 
 
@@ -198,7 +232,277 @@ hi
 
 \end{frame}
 
-\subsection{Storing and Loading the Index}
+\subsection{Caching the Index}
+
+\begin{frame}
+  \frametitle{Caching the Index}
+
+  \begin{block}{Postings Lists}
+    \begin{tabular}{ l | l }
+      term & postings \\ \hline
+      the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+      python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+      ate & $ \langle 1,(3) \rangle $ \\
+      apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+      eat & $ \langle 1,(4) \rangle $ \\
+      did & $ \langle 2,(1) \rangle $ \\
+    \end{tabular}
+  \end{block}
+
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Caching the Index}
+
+  \begin{columns}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Postings Lists}
+      \begin{tabular}{ l | l }
+        term & postings \\ \hline
+        \rowcolor{LightCyan}
+        the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+        python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+        ate & $ \langle 1,(3) \rangle $ \\
+        apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+        eat & $ \langle 1,(4) \rangle $ \\
+        did & $ \langle 2,(1) \rangle $ \\
+      \end{tabular}
+    \end{block}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Positions Table}
+      \begin{tabular}{ l | l }
+        term & position in binary file \\ \hline
+        \rowcolor{LightCyan}
+        the & 0 \\
+      \end{tabular}
+    \end{block}
+    
+  \end{columns}
+
+  \begin{block}{Cache}
+    \colorbox{LightCyan}{$ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Caching the Index}
+
+  \begin{columns}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Postings Lists}
+      \begin{tabular}{ l | l }
+        term & postings \\ \hline
+        the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+        \rowcolor{LightCyan}
+        python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+        ate & $ \langle 1,(3) \rangle $ \\
+        apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+        eat & $ \langle 1,(4) \rangle $ \\
+        did & $ \langle 2,(1) \rangle $ \\
+      \end{tabular}
+    \end{block}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Positions Table}
+      \begin{tabular}{ l | l }
+        term & position in binary file \\ \hline
+        the & 0 \\
+        \rowcolor{LightCyan}
+        python & 40 \\
+      \end{tabular}
+    \end{block}
+    
+  \end{columns}
+
+  \begin{block}{Cache}
+    $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $
+    \colorbox{LightCyan}{$ \langle 1,(2) \rangle \langle 2,(3) \rangle $}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Caching the Index}
+
+  \begin{columns}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Postings Lists}
+      \begin{tabular}{ l | l }
+        term & postings \\ \hline
+        the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+        python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+        \rowcolor{LightCyan}
+        ate & $ \langle 1,(3) \rangle $ \\
+        apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+        eat & $ \langle 1,(4) \rangle $ \\
+        did & $ \langle 2,(1) \rangle $ \\
+      \end{tabular}
+    \end{block}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Positions Table}
+      \begin{tabular}{ l | l }
+        term & position in binary file \\ \hline
+        the & 0 \\
+        python & 40 \\
+        \rowcolor{LightCyan}        
+        ate & 90 \\
+      \end{tabular}
+    \end{block}
+    
+  \end{columns}
+
+  \begin{block}{Cache}
+    $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $
+    $ \langle 1,(2) \rangle \langle 2,(3) \rangle $
+    \colorbox{LightCyan}{$ \langle 1,(3) \rangle $}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Caching the Index}
+
+  \begin{columns}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Postings Lists}
+      \begin{tabular}{ l | l }
+        term & postings \\ \hline
+        the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+        python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+        ate & $ \langle 1,(3) \rangle $ \\
+        \rowcolor{LightCyan}
+        apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+        eat & $ \langle 1,(4) \rangle $ \\
+        did & $ \langle 2,(1) \rangle $ \\
+      \end{tabular}
+    \end{block}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Positions Table}
+      \begin{tabular}{ l | l }
+        term & position in binary file \\ \hline
+        the & 0 \\
+        python & 40 \\
+        ate & 90 \\
+        \rowcolor{LightCyan}
+        apple & 120 \\
+      \end{tabular}
+    \end{block}
+    
+  \end{columns}
+
+  \begin{block}{Cache}
+    $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $
+    $ \langle 1,(2) \rangle \langle 2,(3) \rangle $
+    $ \langle 1,(3) \rangle $
+    \colorbox{LightCyan}{$ \langle 1,(5) \rangle \langle 2,(6) \rangle $}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Caching the Index}
+
+  \begin{columns}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Postings Lists}
+      \begin{tabular}{ l | l }
+        term & postings \\ \hline
+        the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+        python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+        ate & $ \langle 1,(3) \rangle $ \\
+        apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+        \rowcolor{LightCyan}
+        eat & $ \langle 1,(4) \rangle $ \\
+        did & $ \langle 2,(1) \rangle $ \\
+      \end{tabular}
+    \end{block}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Positions Table}
+      \begin{tabular}{ l | l }
+        term & position in binary file \\ \hline
+        the & 0 \\
+        python & 40 \\
+        ate & 90 \\
+        apple & 120 \\
+        \rowcolor{LightCyan}
+        eat & 170 \\
+      \end{tabular}
+    \end{block}
+    
+  \end{columns}
+
+  \begin{block}{Cache}
+    $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $
+    $ \langle 1,(2) \rangle \langle 2,(3) \rangle $
+    $ \langle 1,(3) \rangle $
+    $ \langle 1,(5) \rangle \langle 2,(6) \rangle $
+    \colorbox{LightCyan}{$ \langle 1,(4) \rangle $}
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Caching the Index}
+
+  \begin{columns}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Postings Lists}
+      \begin{tabular}{ l | l }
+        term & postings \\ \hline
+        the & $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $ \\
+        python & $ \langle 1,(2) \rangle \langle 2,(3) \rangle $ \\
+        ate & $ \langle 1,(3) \rangle $ \\
+        apple & $ \langle 1,(5) \rangle \langle 2,(6) \rangle $ \\
+        eat & $ \langle 1,(4) \rangle $ \\
+        \rowcolor{LightCyan}
+        did & $ \langle 2,(1) \rangle $ \\
+      \end{tabular}
+    \end{block}
+
+    \column{0.5\textwidth}
+
+    \begin{block}{Positions Table}
+      \begin{tabular}{ l | l }
+        term & position in binary file \\ \hline
+        the & 0 \\
+        python & 40 \\
+        ate & 90 \\
+        apple & 120 \\
+        eat & 170 \\
+        \rowcolor{LightCyan}
+        did & 210 \\
+      \end{tabular}
+    \end{block}
+    
+  \end{columns}
+
+  \begin{block}{Cache}
+    $ \langle 1,(1,4) \rangle \langle 2,(2,5) \rangle $
+    $ \langle 1,(2) \rangle \langle 2,(3) \rangle $
+    $ \langle 1,(3) \rangle $
+    $ \langle 1,(5) \rangle \langle 2,(6) \rangle $
+    $ \langle 1,(4) \rangle $
+    \colorbox{LightCyan}{$ \langle 2,(1) \rangle $}
+  \end{block}
+\end{frame}
 
 \section{Difficulties}
 
